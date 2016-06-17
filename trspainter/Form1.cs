@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -39,7 +38,7 @@ namespace trspainter
             {
                 _currentFile = value;
 
-                Text = @"TRS Pixel Graphic Designer";
+                Text = @"TRSPainty - TRS Pixel Graphic Designer";
                 if (!string.IsNullOrWhiteSpace(_currentFile))
                 {
                     Text += $" : {_currentFile}";
@@ -296,6 +295,12 @@ namespace trspainter
             OnResizeHandler();
 
             CurrentFile = null;
+        }
+
+        private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var ab = new AboutBox1();
+            ab.Show();
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)

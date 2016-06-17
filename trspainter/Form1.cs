@@ -26,10 +26,10 @@ namespace trspainter
 
         private readonly Brush _darkBrush;
         private readonly Brush _slightlyLessDarkBrush;
+
         private bool _changes;
 
         private string _currentFile;
-
         private string CurrentFile
         {
             get { return _currentFile; }
@@ -62,18 +62,18 @@ namespace trspainter
             OnResizeHandler();
         }
 
-        private int ClientWidthAdjusted => ClientSize.Width;
-        private int ClientHeightAdjusted => ClientSize.Height - menuStrip1.Height;
-
         private void OnResizeHandler()
         {
-            _grDx = (float)ClientWidthAdjusted / 128;
-            _grDy = (float)ClientHeightAdjusted / 48;
+            _grDx = (float)pictureBox1.Width / 128;
+            _grDy = (float)pictureBox1.Height / 48;
 
-            _chDx = (float)ClientWidthAdjusted / 64;
-            _chDy = (float)ClientHeightAdjusted / 16;
+            _chDx = (float)pictureBox1.Width / 64;
+            _chDy = (float)pictureBox1.Height / 16;
 
-            _canvas = new Bitmap(ClientWidthAdjusted, ClientHeightAdjusted);
+            if (pictureBox1.Height == 0) return;
+
+            _canvas = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            pictureBox1.Image = _canvas;
 
             var g = Graphics.FromImage(_canvas);
 
@@ -98,15 +98,15 @@ namespace trspainter
             OnResizeHandler();
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
             var pos = e.Location;
 
             var cxCell = (int)Math.Floor(pos.X / _grDx);
-            var cyCell = (int)Math.Floor((pos.Y - menuStrip1.Height) / _grDy);
+            var cyCell = (int)Math.Floor(pos.Y / _grDy);
 
             _chXCell = (int)Math.Floor(pos.X / _chDx);
-            _chYCell = (int)Math.Floor((pos.Y - menuStrip1.Height) / _chDy);
+            _chYCell = (int)Math.Floor(pos.Y / _chDy);
 
             labelCharCell.Text = $"{_chXCell},{_chYCell}";
             labelSubPix.Text = $"{_grXCell},{_grYCell}";
@@ -135,13 +135,14 @@ namespace trspainter
             Graphics.FromImage(_canvas)
                 .FillRectangle(_pixels[_grXCell, _grYCell] ? _greenScreen ? Brushes.LawnGreen : Brushes.WhiteSmoke : (hatch ? _darkBrush : _slightlyLessDarkBrush), _grXCell * _grDx, _grYCell * _grDy, _grDx, _grDy);
 
-            Invalidate();
+            pictureBox1.Invalidate();
 
             _changes = true;
             CurrentFile = CurrentFile; // to put the '*' on the name
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
 
@@ -151,19 +152,10 @@ namespace trspainter
             DrawCell();
         }
 
-        protected override void OnMouseUp(MouseEventArgs e)
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
             _erasing = false;
             _drawing = false;
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            e.Graphics.DrawImage(_canvas, 0, menuStrip1.Height);
         }
 
         private void DoSaveToCurrentFile()

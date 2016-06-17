@@ -1,4 +1,4 @@
-﻿namespace trspainter
+﻿namespace trspainty
 {
     partial class Form1
     {
